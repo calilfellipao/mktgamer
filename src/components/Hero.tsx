@@ -5,6 +5,16 @@ import { useApp } from '../contexts/AppContext';
 
 export function Hero() {
   const { setCurrentPage } = useApp();
+  const { user } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const handleCreateProduct = () => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    setCurrentPage('create-product');
+  };
 
   return (
     <section className="relative pt-24 pb-20 bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden">
@@ -51,7 +61,7 @@ export function Hero() {
               variant="secondary" 
               size="lg" 
               icon={TrendingUp}
-              onClick={() => setCurrentPage('create-product')}
+              onClick={handleCreateProduct}
               className="text-lg px-8 py-4"
             >
               💰 Vender Agora
@@ -90,6 +100,14 @@ export function Hero() {
             </div>
           </div>
           
+          {!user && (
+            <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-4 mb-8">
+              <p className="text-yellow-300 text-center">
+                ⚠️ <strong>Faça login para ter acesso a todas as funcionalidades</strong> - comprar, vender, chat e saques
+              </p>
+            </div>
+          )}
+
           {/* Trust indicators */}
           <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-400">
             <div className="flex items-center space-x-2 bg-gray-900/50 px-4 py-2 rounded-full border border-gray-800">
@@ -111,6 +129,14 @@ export function Hero() {
           </div>
         </div>
       </div>
+      
+      {/* Login Modal */}
+      {showLoginModal && (
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+        />
+      )}
     </section>
   );
 }

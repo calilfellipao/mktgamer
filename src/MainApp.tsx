@@ -23,34 +23,16 @@ import { useAuth } from './contexts/AuthContext';
 
 export function MainApp() {
   const { user } = useAuth();
-  const {
-    items,
-    isOpen,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    toggleCart,
-    checkout,
-    total,
-    itemCount
-  } = useCart();
+  const { items, isOpen, removeFromCart, updateQuantity, toggleCart, checkout, total, itemCount } = useCart();
 
   const { currentPage } = useApp();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  // Função para ações que requerem login
-  const handleProtectedAction = (action: () => void) => {
-    if (!user) {
-      setIsLoginOpen(true);
-      return;
-    }
-    action();
-  };
 
   const renderPage = () => {
     switch (currentPage) {
       case 'products':
-        return <ProductsPage onAddToCart={(product) => handleProtectedAction(() => addToCart(product))} />;
+        return <ProductsPage />;
       case 'admin':
         return <AdminDashboard />;
       case 'support':
@@ -74,7 +56,7 @@ export function MainApp() {
           <main>
             <Hero />
             <GameCategories />
-            <FeaturedProducts onAddToCart={(product) => handleProtectedAction(() => addToCart(product))} />
+            <FeaturedProducts />
             <PricingPlans />
           </main>
         );

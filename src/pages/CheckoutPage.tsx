@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CreditCard, 
   Shield, 
@@ -20,8 +20,9 @@ interface CheckoutPageProps {
 }
 
 export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
-  const { items, total } = useCart();
+  const { items, total, clearCart } = useCart();
   const { setCurrentPage } = useApp();
+  const [singleProduct, setSingleProduct] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [pixCode, setPixCode] = useState('');
   const [showPixQR, setShowPixQR] = useState(false);
@@ -29,7 +30,17 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [showStripeCheckout, setShowStripeCheckout] = useState(false);
 
-  const finalTotal = total;
+  // Verificar se há produto único no sessionStorage
+  useEffect(() => {
+    const storedProduct = sessionStorage.getItem('checkoutProduct');
+    if (storedProduct) {
+      setSingleProduct(JSON.parse(storedProduct));
+      sessionStorage.removeItem('checkoutProduct');
+    }
+  }, []);
+
+  const finalTotal = singleProduct ? singleProduct.price : total;
+  const checkoutItems = singleProduct ? [{ product: singleProduct, quantity: 1 }] : items;
 
   const paymentMethods = [
     {
@@ -70,10 +81,16 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
         
         // Simulate PIX payment confirmation after 10 seconds
         setTimeout(async () => {
-          const success = await onCheckout();
-          if (success) {
+          if (singleProduct) {
+            // Para produto único, simular compra direta
             setIsProcessing(false);
             setIsCompleted(true);
+          } else {
+            const success = await onCheckout();
+            if (success) {
+              setIsProcessing(false);
+              setIsCompleted(true);
+            }
           }
         }, 10000);
       } else if (paymentMethod === 'card') {
@@ -83,10 +100,15 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
       } else {
         // Simulate other payment methods
         setTimeout(async () => {
-          const success = await onCheckout();
-          if (success) {
+          if (singleProduct) {
             setIsProcessing(false);
             setIsCompleted(true);
+          } else {
+            const success = await onCheckout();
+            if (success) {
+              setIsProcessing(false);
+              setIsCompleted(true);
+            }
           }
         }, 3000);
       }
@@ -99,10 +121,15 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
 
   const handleStripeSuccess = async (paymentIntent: any) => {
     console.log('Payment successful:', paymentIntent);
-    const success = await onCheckout();
-    if (success) {
+    if (singleProduct) {
       setShowStripeCheckout(false);
       setIsCompleted(true);
+    } else {
+      const success = await onCheckout();
+      if (success) {
+        setShowStripeCheckout(false);
+        setIsCompleted(true);
+      }
     }
   };
 
@@ -134,8 +161,8 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
             <div className="mb-6">
               <h2 className="text-xl font-bold text-white mb-4">Resumo do Pedido</h2>
               <div className="space-y-2">
-                {items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
+                {checkoutItems.map((item) => (
+                  <div key={item.product.id} className="flex justify-between text-sm">
                     <span className="text-gray-400">{item.product.title} x{item.quantity}</span>
                     <span className="text-white">R$ {(item.product.price * item.quantity).toFixed(2)}</span>
                   </div>
@@ -150,7 +177,7 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
 
             <StripeCheckout
               amount={finalTotal}
-              items={items}
+              items={checkoutItems}
               onSuccess={handleStripeSuccess}
               onError={handleStripeError}
             />
@@ -193,7 +220,7 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
     );
   }
 
-  if (items.length === 0 && !isCompleted) {
+  if (checkoutItems.length === 0 && !isCompleted && !singleProduct) {
     return (
       <div className="min-h-screen bg-black pt-20 flex items-center justify-center">
         <div className="text-center">
@@ -271,7 +298,7 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
               <h2 className="text-xl font-bold text-white mb-4">Resumo do Pedido</h2>
               
               <div className="space-y-4">
-                {items.map((item) => (
+                {checkoutItems.map((item) => (
                   <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg">
                     <img
                       src={item.product.images[0]}

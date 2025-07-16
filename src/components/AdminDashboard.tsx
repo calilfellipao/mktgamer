@@ -27,6 +27,10 @@ export function AdminDashboard() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showProductModal, setShowProductModal] = useState(false);
 
   // Check if user is admin or the master admin
   const isMasterAdmin = user?.email === 'califellipee@outlook.com' || user?.role === 'admin';
@@ -172,20 +176,62 @@ export function AdminDashboard() {
 
   const handleUserVerification = async (userId: string, verified: boolean) => {
     try {
+      console.log('🔐 Alterando verificação do usuário:', userId, verified);
+      
       const { error } = await supabase
         .from('users')
         .update({ is_verified: verified, updated_at: new Date().toISOString() })
         .eq('id', userId);
 
       if (error) throw error;
+      console.log('✅ Verificação alterada');
       loadUsers(); // Reload data
     } catch (error) {
       console.error('Error updating user:', error);
     }
   };
 
+  const handleUserRoleChange = async (userId: string, role: string) => {
+    try {
+      console.log('👑 Alterando role do usuário:', userId, role);
+      
+      const { error } = await supabase
+        .from('users')
+        .update({ role, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+
+      if (error) throw error;
+      console.log('✅ Role alterada');
+      loadUsers();
+    } catch (error) {
+      console.error('Error updating user role:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    
+    try {
+      console.log('🗑️ Excluindo usuário:', userId);
+      
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
+
+      if (error) throw error;
+      console.log('✅ Usuário excluído');
+      loadUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
   const handleProductApproval = async (productId: string, approved: boolean) => {
     try {
+      console.log('📦 Alterando status do produto:', productId, approved);
+      
       const { error } = await supabase
         .from('products')
         .update({ 
@@ -195,12 +241,33 @@ export function AdminDashboard() {
         .eq('id', productId);
 
       if (error) throw error;
+      console.log('✅ Status do produto alterado');
       loadProducts(); // Reload data
     } catch (error) {
       console.error('Error updating product:', error);
     }
   };
 
+  const handleDeleteProduct = async (productId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    
+    try {
+      console.log('🗑️ Excluindo produto:', productId);
+      
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
+
+      if (error) throw error;
+      console.log('✅ Produto excluído');
+      loadProducts();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
   return (
     <div className="min-h-screen bg-black pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -325,6 +392,10 @@ export function AdminDashboard() {
                             variant="ghost" 
                             size="sm" 
                             icon={Eye}
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowUserModal(true);
+                            }}
                           >
                             Ver
                           </Button>
@@ -338,6 +409,14 @@ export function AdminDashboard() {
                               Verificar
                             </Button>
                           )}
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            Excluir
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -397,6 +476,10 @@ export function AdminDashboard() {
                             variant="ghost" 
                             size="sm" 
                             icon={Eye}
+                            onClick={() => {
+                              setSelectedProduct(product);
+                              setShowProductModal(true);
+                            }}
                           >
                             Ver
                           </Button>
@@ -420,6 +503,14 @@ export function AdminDashboard() {
                               </Button>
                             </>
                           )}
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            Excluir
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -551,6 +642,128 @@ export function AdminDashboard() {
           </div>
         )}
       </div>
+      
+      {/* User Details Modal */}
+      {showUserModal && selectedUser && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowUserModal(false)} />
+          
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl">
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-6">Detalhes do Usuário</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={selectedUser.avatar_url || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1'}
+                    alt={selectedUser.username}
+                    className="w-16 h-16 rounded-full"
+                  />
+                  <div>
+                    <h4 className="text-white font-bold text-lg">{selectedUser.username}</h4>
+                    <p className="text-gray-400">{selectedUser.email}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Role</label>
+                    <select
+                      value={selectedUser.role}
+                      onChange={(e) => handleUserRoleChange(selectedUser.id, e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                    >
+                      <option value="user">Usuário</option>
+                      <option value="moderator">Moderador</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Saldo</label>
+                    <p className="text-green-400 font-bold text-lg">R$ {(selectedUser.balance || 0).toFixed(2)}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-gray-400">Membro desde: {new Date(selectedUser.created_at).toLocaleDateString('pt-BR')}</p>
+                  <p className="text-gray-400">Verificado: {selectedUser.is_verified ? '✅ Sim' : '❌ Não'}</p>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-6">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowUserModal(false)}
+                >
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Product Details Modal */}
+      {showProductModal && selectedProduct && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowProductModal(false)} />
+          
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl">
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-6">Detalhes do Produto</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  {selectedProduct.images?.[0] && (
+                    <img
+                      src={selectedProduct.images[0]}
+                      alt={selectedProduct.title}
+                      className="w-24 h-24 object-cover rounded-lg"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <h4 className="text-white font-bold text-lg">{selectedProduct.title}</h4>
+                    <p className="text-gray-400 mb-2">{selectedProduct.description}</p>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="primary">{selectedProduct.game}</Badge>
+                      <Badge variant="secondary">{selectedProduct.category}</Badge>
+                      <Badge variant={
+                        selectedProduct.status === 'active' ? 'success' :
+                        selectedProduct.status === 'pending_approval' ? 'warning' : 'error'
+                      }>
+                        {selectedProduct.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-gray-400">Preço: <span className="text-green-400 font-bold">R$ {selectedProduct.price.toFixed(2)}</span></p>
+                    <p className="text-gray-400">Taxa: {selectedProduct.commission_rate}%</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400">Vendedor: {selectedProduct.seller?.username || 'N/A'}</p>
+                    <p className="text-gray-400">Criado em: {new Date(selectedProduct.created_at).toLocaleDateString('pt-BR')}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-6">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowProductModal(false)}
+                >
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

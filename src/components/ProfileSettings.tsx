@@ -149,7 +149,7 @@ export function ProfileSettings() {
     }
 
     if (!user.is_verified) {
-      setMessage('❌ Conta não verificada. Complete a verificação KYC primeiro.');
+      setMessage('❌ Conta não verificada. Complete a verificação de identidade primeiro.');
       return;
     }
 

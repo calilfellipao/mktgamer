@@ -1,7 +1,4 @@
-// This file now only contains type definitions and static data - all mock data removed
-import { Product, User, Plan } from '../types';
-
-// Static games list for UI (not mock data)
+// Lista de jogos disponíveis na plataforma
 export const games = [
   { name: 'Free Fire', icon: '🔥', color: 'from-orange-500 to-red-500' },
   { name: 'Valorant', icon: '🎯', color: 'from-red-500 to-pink-500' },
@@ -16,8 +13,3 @@ export const games = [
   { name: 'GTA V', icon: '🚗', color: 'from-yellow-400 to-orange-500' },
   { name: 'Among Us', icon: '👾', color: 'from-red-400 to-pink-500' }
 ];
-
-// All mock data removed - only real data from Supabase is used
-export const mockProducts: Product[] = [];
-export const mockUser: User = {} as User;
-export const plans: Plan[] = [];

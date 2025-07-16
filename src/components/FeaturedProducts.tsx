@@ -4,14 +4,16 @@ import { Product } from '../types';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { ProductService } from '../services/productService';
+import { useAuth } from '../contexts/AuthContext';
+import { useApp } from '../contexts/AppContext';
+import { LoginModal } from './LoginModal';
 
-interface FeaturedProductsProps {
-  onAddToCart: (product: Product) => void;
-}
-
-export function FeaturedProducts({ onAddToCart }: FeaturedProductsProps) {
+export function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { user } = useAuth();
+  const { setCurrentPage } = useApp();
 
   useEffect(() => {
     let isMounted = true;
@@ -69,6 +71,26 @@ export function FeaturedProducts({ onAddToCart }: FeaturedProductsProps) {
       isMounted = false;
     };
   }, []);
+
+  const handleBuyProduct = (product: Product) => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    
+    // Redirecionar direto para checkout com produto único
+    sessionStorage.setItem('checkoutProduct', JSON.stringify(product));
+    setCurrentPage('checkout');
+  };
+
+  const getConditionText = (condition: string) => {
+    switch (condition) {
+      case 'new': return 'Novo';
+      case 'used': return 'Usado';
+      case 'excellent': return 'Excelente';
+      default: return condition;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -137,7 +159,7 @@ export function FeaturedProducts({ onAddToCart }: FeaturedProductsProps) {
                     }}
                   />
                   <div className="absolute top-4 right-4">
-                    <Badge variant="success">{product.condition}</Badge>
+                    <Badge variant="success">{getConditionText(product.condition)}</Badge>
                   </div>
                   <div className="absolute bottom-4 left-4">
                     <Badge variant="primary">{product.game}</Badge>
@@ -191,7 +213,7 @@ export function FeaturedProducts({ onAddToCart }: FeaturedProductsProps) {
                       <Button
                         variant="primary"
                         size="sm"
-                        onClick={() => onAddToCart(product)}
+                        onClick={() => handleBuyProduct(product)}
                       >
                         Comprar
                       </Button>
@@ -203,6 +225,14 @@ export function FeaturedProducts({ onAddToCart }: FeaturedProductsProps) {
           </div>
         )}
       </div>
+      
+      {/* Login Modal */}
+      {showLoginModal && (
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+        />
+      )}
     </section>
   );
 }

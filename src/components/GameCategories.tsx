@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
-import { games } from '../data/mockData';
+import { games } from '../data/gamesList';
 
 // Static games list for UI navigation (not mock data)
 

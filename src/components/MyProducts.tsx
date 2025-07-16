@@ -26,8 +26,14 @@ export function MyProducts() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    description: '',
+    price: '',
+    condition: 'new'
+  });
 
   useEffect(() => {
     if (user) {
@@ -62,7 +68,54 @@ export function MyProducts() {
 
   const handleEdit = (product: any) => {
     setSelectedProduct(product);
-    setShowEditModal(true);
+    setEditFormData({
+      title: product.title,
+      description: product.description,
+      price: product.price.toString(),
+      condition: product.condition || 'new'
+    });
+    setShowEditForm(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedProduct) return;
+    
+    try {
+      console.log('✏️ Editando produto:', selectedProduct.id);
+      
+      const { error } = await supabase
+        .from('products')
+        .update({
+          title: editFormData.title,
+          description: editFormData.description,
+          price: parseFloat(editFormData.price),
+          condition: editFormData.condition,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedProduct.id);
+
+      if (error) {
+        console.error('❌ Erro ao editar produto:', error);
+        return;
+      }
+
+      console.log('✅ Produto editado');
+      setShowEditForm(false);
+      setSelectedProduct(null);
+      loadMyProducts(); // Recarregar lista
+    } catch (error) {
+      console.error('❌ Erro ao editar produto:', error);
+    }
+  };
+
+  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setEditFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleView = (product: any) => {
   };
 
   const handleDelete = (product: any) => {
@@ -323,6 +376,14 @@ export function MyProducts() {
                           <Button 
                             variant="ghost" 
                             size="sm" 
+                            icon={Eye}
+                            onClick={() => handleView(product)}
+                          >
+                            Ver
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
                             icon={product.status === 'active' ? Pause : Play}
                             onClick={() => toggleProductStatus(product.id, product.status)}
                             className={product.status === 'active' ? 'text-orange-400 hover:text-orange-300' : 'text-green-400 hover:text-green-300'}
@@ -384,6 +445,88 @@ export function MyProducts() {
           </div>
         )}
       </div>
+        {/* Edit Form Modal */}
+        {showEditForm && selectedProduct && (
+          <div className="fixed inset-0 z-50 overflow-hidden">
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowEditForm(false)} />
+            
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl">
+              <div className="bg-gray-900 rounded-2xl border border-gray-800 shadow-2xl p-6">
+                <h3 className="text-xl font-bold text-white mb-6">Editar Anúncio</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Título</label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={editFormData.title}
+                      onChange={handleEditInputChange}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
+                    <textarea
+                      name="description"
+                      value={editFormData.description}
+                      onChange={handleEditInputChange}
+                      rows={4}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500 resize-none"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Preço (R$)</label>
+                      <input
+                        type="number"
+                        name="price"
+                        value={editFormData.price}
+                        onChange={handleEditInputChange}
+                        step="0.01"
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Condição</label>
+                      <select
+                        name="condition"
+                        value={editFormData.condition}
+                        onChange={handleEditInputChange}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                      >
+                        <option value="new">Novo</option>
+                        <option value="used">Usado</option>
+                        <option value="excellent">Excelente</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-3 mt-6">
+                  <Button 
+                    variant="primary" 
+                    className="flex-1"
+                    onClick={handleSaveEdit}
+                  >
+                    Salvar Alterações
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => setShowEditForm(false)}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
     </div>
   );
 }

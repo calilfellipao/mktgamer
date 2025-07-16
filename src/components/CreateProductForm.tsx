@@ -18,7 +18,7 @@ import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { useAuth } from '../contexts/AuthContext';
 import { ProductService } from '../services/productService';
-import { games } from '../data/mockData';
+import { games } from '../data/gamesList';
 import { useApp } from '../contexts/AppContext';
 
 export function CreateProductForm() {
@@ -38,8 +38,9 @@ export function CreateProductForm() {
     price: '',
     rarity: '',
     level: '',
+    condition: 'new',
     delivery_time: '1',
-    commission_rate: 10
+    commission_rate: 5
   });
 
   if (!user) {
@@ -142,12 +143,24 @@ export function CreateProductForm() {
   };
 
   const getCommissionBenefits = (rate: number) => {
-    if (rate >= 25) return { level: 'Ultra Destaque', icon: '🌟', color: 'text-yellow-400' };
     if (rate >= 20) return { level: 'Premium Destaque', icon: '🏆', color: 'text-yellow-400' };
-    if (rate >= 15) return { level: 'Super Destaque', icon: '⭐', color: 'text-purple-400' };
-    if (rate >= 10) return { level: 'Destaque', icon: '✨', color: 'text-blue-400' };
-    return { level: 'Padrão', icon: '🥉', color: 'text-gray-400' };
+    if (rate >= 15) return { level: 'Destaque', icon: '⭐', color: 'text-purple-400' };
+    if (rate >= 10) return { level: 'Padrão', icon: '✨', color: 'text-blue-400' };
+    return { level: 'Básico', icon: '🥉', color: 'text-gray-400' };
   };
+
+  const conditions = [
+    { id: 'new', name: 'Novo', description: 'Item nunca usado' },
+    { id: 'used', name: 'Usado', description: 'Item com sinais de uso' },
+    { id: 'excellent', name: 'Excelente', description: 'Item em ótimo estado' }
+  ];
+
+  const commissionOptions = [
+    { value: 5, label: '5% - Básico', description: 'Visibilidade padrão' },
+    { value: 10, label: '10% - Padrão', description: 'Boa visibilidade' },
+    { value: 15, label: '15% - Destaque', description: '+200% visibilidade' },
+    { value: 20, label: '20% - Premium Destaque', description: 'Topo dos resultados + Destaques do Dia' }
+  ];
 
   const handleSubmit = async () => {
     if (!formData.category || !formData.title || !formData.description || !formData.game || !formData.price || imagePreview.length === 0) {
@@ -168,6 +181,7 @@ export function CreateProductForm() {
         game: formData.game,
         price: parseFloat(formData.price),
         images: imagePreview,
+        condition: formData.condition as any,
         rarity: formData.rarity || undefined,
         level: formData.level ? parseInt(formData.level) : undefined,
         delivery_time: parseInt(formData.delivery_time),
@@ -190,8 +204,9 @@ export function CreateProductForm() {
         price: '',
         rarity: '',
         level: '',
+        condition: 'new',
         delivery_time: '1',
-        commission_rate: 10
+        commission_rate: 5
       });
       setSelectedImages([]);
       setImagePreview([]);
@@ -389,6 +404,29 @@ export function CreateProductForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Condição do Item *
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {conditions.map(condition => (
+                      <button
+                        key={condition.id}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, condition: condition.id }))}
+                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                          formData.condition === condition.id
+                            ? 'border-purple-500 bg-purple-500/10'
+                            : 'border-gray-700 hover:border-gray-600 bg-gray-800'
+                        }`}
+                      >
+                        <h4 className="text-white font-medium mb-1">{condition.name}</h4>
+                        <p className="text-gray-400 text-sm">{condition.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Tempo de Entrega (horas)
                   </label>
                   <select
@@ -479,26 +517,25 @@ export function CreateProductForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-4">
-                    Taxa de Comissão e Destaque: {formData.commission_rate}%
+                    Plano de Destaque: {formData.commission_rate}%
                   </label>
                   
-                  <div className="space-y-4">
-                    <input
-                      type="range"
-                      min="5"
-                      max="25"
-                      value={formData.commission_rate}
-                      onChange={(e) => setFormData(prev => ({ ...prev, commission_rate: parseInt(e.target.value) }))}
-                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                    />
-                    
-                    <div className="flex justify-between text-sm text-gray-400">
-                      <span>5% - Básico</span>
-                      <span>10% - Padrão</span>
-                      <span>15% - Destaque</span>
-                      <span>20% - Premium</span>
-                      <span>25% - Ultra Destaque</span>
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {commissionOptions.map(option => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, commission_rate: option.value }))}
+                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                          formData.commission_rate === option.value
+                            ? 'border-purple-500 bg-purple-500/10'
+                            : 'border-gray-700 hover:border-gray-600 bg-gray-800'
+                        }`}
+                      >
+                        <h4 className="text-white font-medium mb-1">{option.label}</h4>
+                        <p className="text-gray-400 text-sm">{option.description}</p>
+                      </button>
+                    ))}
                   </div>
 
                   <div className="mt-4 p-4 bg-gray-800 rounded-lg">
@@ -510,20 +547,7 @@ export function CreateProductForm() {
                     </div>
                     
                     <div className="space-y-2 text-sm">
-                      {formData.commission_rate >= 25 && (
-                        <>
-                          <div className="flex items-center space-x-2 text-yellow-400">
-                            <Zap className="w-4 h-4" />
-                            <span>🌟 ULTRA DESTAQUE - Sempre no topo absoluto</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-yellow-400">
-                            <Star className="w-4 h-4" />
-                            <span>Aparece em "Destaques do Dia"</span>
-                          </div>
-                        </>
-                      )}
-                      
-                      {formData.commission_rate >= 20 && formData.commission_rate < 25 && (
+                      {formData.commission_rate >= 20 && (
                         <>
                           <div className="flex items-center space-x-2 text-yellow-400">
                             <Zap className="w-4 h-4" />
@@ -605,7 +629,10 @@ export function CreateProductForm() {
                         <Badge variant="secondary">
                           {categories.find(c => c.id === formData.category)?.name}
                         </Badge>
-                        {formData.rarity && (
+                        <Badge variant="success">
+                          {conditions.find(c => c.id === formData.condition)?.name}
+                        </Badge>
+                        {formData.rarity && formData.category === 'skin' && (
                           <Badge variant="success">
                             {rarities.find(r => r.id === formData.rarity)?.name}
                           </Badge>

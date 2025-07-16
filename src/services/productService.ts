@@ -87,11 +87,18 @@ export class ProductService {
     level?: number;
     delivery_time: number;
     commission_rate: number;
+        condition: 'new' | 'used' | 'excellent';
   }) {
     return ErrorHandler.withRetry(async () => {
       console.log('📝 Criando produto...');
       
-      // Determinar se deve ser destacado (taxa >= 20%)
+      // Validar taxa de comissão
+      const allowedRates = [5, 10, 15, 20];
+      if (!allowedRates.includes(productData.commission_rate)) {
+        throw new Error('Taxa de comissão deve ser 5%, 10%, 15% ou 20%');
+      }
+      
+      // Determinar se deve ser destacado (taxa = 20%)
       const highlighted = productData.commission_rate >= 20;
       
       const { data, error } = await supabase
