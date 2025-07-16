@@ -182,6 +182,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('❌ Erro no login:', error);
+        
+        // Provide more helpful error messages
+        if (error.message.includes('Supabase not configured')) {
+          alert('⚠️ Configuração necessária: Por favor, configure suas credenciais do Supabase no arquivo .env');
+          return false;
+        }
+        
         setIsLoading(false);
         return false;
       }

@@ -76,7 +76,15 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       }
     } catch (err: any) {
       console.error('❌ Erro na autenticação:', err);
-      setError(err.message || 'Erro interno. Tente novamente.');
+      
+      // Provide more helpful error messages
+      if (err.message && err.message.includes('Supabase not configured')) {
+        setError('⚠️ Aplicação não configurada. Verifique as configurações do Supabase.');
+      } else if (err.message && err.message.includes('Failed to fetch')) {
+        setError('❌ Erro de conexão. Verifique sua internet e as configurações do Supabase.');
+      } else {
+        setError(err.message || 'Erro interno. Tente novamente.');
+      }
     }
     
     // setIsLoading será controlado pelo AuthContext

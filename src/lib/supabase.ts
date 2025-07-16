@@ -3,29 +3,60 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Variáveis de ambiente do Supabase não configuradas');
+// Validate environment variables
+if (!supabaseUrl || !supabaseAnonKey || 
+    supabaseUrl === 'https://your-project.supabase.co' || 
+    supabaseAnonKey === 'your-anon-key') {
+  console.error('❌ Supabase environment variables not configured properly');
+  console.error('Please update your .env file with actual Supabase credentials');
+  console.error('Current URL:', supabaseUrl);
+  console.error('Current Key:', supabaseAnonKey ? 'Set but may be placeholder' : 'Missing');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false, // Desabilitar para evitar problemas
-    flowType: 'pkce'
-  },
-  global: {
-    headers: {
-      'x-client-info': 'gg-sync-market'
-    }
-  },
-  // Add retry logic for better reliability
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
+// Create a fallback client to prevent crashes
+const createSupabaseClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey || 
+      supabaseUrl === 'https://your-project.supabase.co' || 
+      supabaseAnonKey === 'your-anon-key') {
+    // Return a mock client that throws helpful errors
+    return {
+      auth: {
+        signInWithPassword: () => Promise.reject(new Error('Supabase not configured. Please update your .env file with actual Supabase credentials.')),
+        signUp: () => Promise.reject(new Error('Supabase not configured. Please update your .env file with actual Supabase credentials.')),
+        signOut: () => Promise.reject(new Error('Supabase not configured. Please update your .env file with actual Supabase credentials.')),
+        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
+      },
+      from: () => ({
+        select: () => Promise.reject(new Error('Supabase not configured. Please update your .env file with actual Supabase credentials.')),
+        insert: () => Promise.reject(new Error('Supabase not configured. Please update your .env file with actual Supabase credentials.')),
+        update: () => Promise.reject(new Error('Supabase not configured. Please update your .env file with actual Supabase credentials.')),
+        delete: () => Promise.reject(new Error('Supabase not configured. Please update your .env file with actual Supabase credentials.'))
+      })
+    } as any;
   }
-});
+
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+      flowType: 'pkce'
+    },
+    global: {
+      headers: {
+        'x-client-info': 'gg-sync-market'
+      }
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
+    }
+  });
+}
+
+export const supabase = createSupabaseClient();
 
 // Tipos do banco de dados
 export interface User {
