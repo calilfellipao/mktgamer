@@ -17,7 +17,7 @@ import {
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { ProductService } from '../services/productService';
 import { games } from '../data/mockData';
 import { useApp } from '../contexts/AppContext';
 

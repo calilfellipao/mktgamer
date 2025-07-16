@@ -32,42 +32,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false); // Não bloquear a UI inicialmente
 
   useEffect(() => {
-    let isMounted = true;
-    
-    // Get initial session
-    const initializeAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (!isMounted) return;
-        
-        if (error) {
-          console.error('❌ Erro ao obter sessão:', error);
-          setIsLoading(false);
-          return;
-        }
-        
-        if (session?.user) {
-          await loadUserProfile(session.user);
-        } else {
-          setIsLoading(false);
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error('❌ Erro na inicialização:', error);
-          setIsLoading(false);
-        }
+    // Get initial session synchronously to avoid loading delay
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('❌ Erro ao obter sessão:', error);
+        setIsLoading(false);
+        return;
       }
-    };
-    
-    initializeAuth();
+      
+      if (session?.user) {
+        loadUserProfile(session.user);
+      } else {
+        setIsLoading(false);
+      }
+    });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted) return;
-      
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        await loadUserProfile(session.user);
+        loadUserProfile(session.user);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setIsLoading(false);
@@ -75,7 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
-      isMounted = false;
       subscription.unsubscribe();
     };
   }, []);

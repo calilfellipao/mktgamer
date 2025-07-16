@@ -33,9 +33,9 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       return;
     }
     
-    setIsLoading(true);
-
     try {
+      setIsLoading(true);
+      
       if (isLogin) {
         console.log('🔐 Tentando fazer login com:', formData.email);
         const success = await login(formData.email, formData.password);
@@ -49,13 +49,11 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       } else {
         if (formData.password !== formData.confirmPassword) {
           setError('❌ As senhas não coincidem');
-          setIsLoading(false);
           return;
         }
         
         if (formData.password.length < 6) {
           setError('❌ A senha deve ter pelo menos 6 caracteres');
-          setIsLoading(false);
           return;
         }
         
@@ -85,9 +83,9 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
       } else {
         setError(err.message || 'Erro interno. Tente novamente.');
       }
+    } finally {
+      setIsLoading(false);
     }
-    
-    // setIsLoading será controlado pelo AuthContext
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

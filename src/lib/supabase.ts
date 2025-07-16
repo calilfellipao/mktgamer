@@ -41,17 +41,17 @@ const createSupabaseClient = () => {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false,
-      flowType: 'pkce'
+      flowType: 'pkce',
+      storage: window.localStorage,
+      storageKey: 'sb-auth-token'
     },
     global: {
       headers: {
         'x-client-info': 'gg-sync-market'
       }
     },
-    realtime: {
-      params: {
-        eventsPerSecond: 10
-      }
+    db: {
+      schema: 'public'
     }
   });
 }
