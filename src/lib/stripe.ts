@@ -6,7 +6,7 @@ if (!stripePublishableKey) {
   console.warn('⚠️ Stripe publishable key not configured');
 }
 
-export const stripePromise = loadStripe(stripePublishableKey);
+export const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 export const formatPrice = (amount: number, currency = 'BRL') => {
   return new Intl.NumberFormat('pt-BR', {
