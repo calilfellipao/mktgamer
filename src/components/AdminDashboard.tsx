@@ -603,6 +603,78 @@ export function AdminDashboard() {
           </div>
         )}
 
+        {/* Tickets Tab */}
+        {activeTab === 'tickets' && (
+          <div className="bg-gray-900 rounded-xl border border-gray-800">
+            <div className="p-6 border-b border-gray-800">
+              <h3 className="text-xl font-bold text-white">Tickets de Suporte ({tickets.length})</h3>
+            </div>
+            <div className="p-6">
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+                  <p className="text-gray-400">Carregando tickets...</p>
+                </div>
+              ) : tickets.length === 0 ? (
+                <div className="text-center py-12">
+                  <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-white mb-2">Nenhum ticket encontrado</h3>
+                  <p className="text-gray-400">Os tickets de suporte aparecerão aqui.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {tickets.map(ticket => (
+                    <div key={ticket.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={ticket.user?.avatar_url || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1'}
+                          alt={ticket.user?.username}
+                          className="w-12 h-12 rounded-full"
+                        />
+                        <div>
+                          <p className="text-white font-medium">{ticket.subject}</p>
+                          <p className="text-gray-400 text-sm">Por: {ticket.user?.username}</p>
+                          <p className="text-gray-500 text-xs">
+                            {new Date(ticket.created_at).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Badge variant={
+                          ticket.status === 'new' ? 'warning' :
+                          ticket.status === 'in_progress' ? 'primary' :
+                          ticket.status === 'resolved' ? 'success' : 'secondary'
+                        }>
+                          {ticket.status === 'new' ? 'Novo' :
+                           ticket.status === 'in_progress' ? 'Em Andamento' :
+                           ticket.status === 'resolved' ? 'Resolvido' : 'Fechado'}
+                        </Badge>
+                        <Badge variant={
+                          ticket.priority === 'urgent' ? 'error' :
+                          ticket.priority === 'high' ? 'warning' :
+                          ticket.priority === 'medium' ? 'primary' : 'secondary'
+                        }>
+                          {ticket.priority === 'urgent' ? '🚨 Urgente' :
+                           ticket.priority === 'high' ? '🔴 Alta' :
+                           ticket.priority === 'medium' ? '🟡 Média' : '🟢 Baixa'}
+                        </Badge>
+                        <div className="flex space-x-2">
+                          <Button variant="ghost" size="sm" icon={Eye}>
+                            Ver
+                          </Button>
+                          <Button variant="primary" size="sm" icon={MessageSquare}>
+                            Responder
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="bg-gray-900 rounded-xl border border-gray-800">
