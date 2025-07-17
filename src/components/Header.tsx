@@ -29,7 +29,7 @@ interface HeaderProps {
 
 export function Header({ onToggleCart, cartItemCount, onOpenLogin }: HeaderProps) {
   const { user, logout } = useAuth();
-  const { setCurrentPage, setSearchQuery, searchQuery, setSelectedCategory } = useApp();
+  const { setCurrentPage, setSearchQuery, searchQuery, setSelectedCategory, selectedCategory } = useApp();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -118,28 +118,36 @@ export function Header({ onToggleCart, cartItemCount, onOpenLogin }: HeaderProps
               <button onClick={() => {
                 setSelectedCategory('account');
                 handleNavClick('products');
-              }} className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+              }} className={`transition-colors flex items-center space-x-1 ${
+                selectedCategory === 'account' ? 'text-purple-400 font-semibold' : 'text-gray-300 hover:text-white'
+              }`}>
                 <User className="w-4 h-4" />
                 <span>Contas</span>
               </button>
               <button onClick={() => {
                 setSelectedCategory('skin');
                 handleNavClick('products');
-              }} className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+              }} className={`transition-colors flex items-center space-x-1 ${
+                selectedCategory === 'skin' ? 'text-purple-400 font-semibold' : 'text-gray-300 hover:text-white'
+              }`}>
                 <Sparkles className="w-4 h-4" />
                 <span>Skins</span>
               </button>
               <button onClick={() => {
                 setSelectedCategory('giftcard');
                 handleNavClick('products');
-              }} className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+              }} className={`transition-colors flex items-center space-x-1 ${
+                selectedCategory === 'giftcard' ? 'text-purple-400 font-semibold' : 'text-gray-300 hover:text-white'
+              }`}>
                 <Gift className="w-4 h-4" />
                 <span>Gift Cards</span>
               </button>
               <button onClick={() => {
                 setSelectedCategory('service');
                 handleNavClick('products');
-              }} className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+              }} className={`transition-colors flex items-center space-x-1 ${
+                selectedCategory === 'service' ? 'text-purple-400 font-semibold' : 'text-gray-300 hover:text-white'
+              }`}>
                 <Zap className="w-4 h-4" />
                 <span>Serviços</span>
               </button>

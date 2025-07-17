@@ -11,6 +11,8 @@ interface AppContextType {
   setSelectedCategory: (category: string) => void;
   refreshProducts: () => void;
   setRefreshProducts: (fn: () => void) => void;
+  notification: string;
+  setNotification: (message: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);

@@ -17,15 +17,19 @@ import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { useApp } from '../contexts/AppContext';
+import { TicketService } from '../services/ticketService';
 
 export function AdminDashboard() {
   const { user } = useAuth();
+  const { setNotification } = useApp();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState<any>({});
   const [users, setUsers] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -54,6 +58,7 @@ export function AdminDashboard() {
     { id: 'products', label: 'Produtos', icon: Package },
     { id: 'transactions', label: 'Transações', icon: DollarSign },
     { id: 'withdrawals', label: 'Saques', icon: Download },
+    { id: 'tickets', label: 'Tickets', icon: MessageSquare },
     { id: 'settings', label: 'Configurações', icon: Settings }
   ];
 
@@ -74,6 +79,8 @@ export function AdminDashboard() {
         await loadTransactions();
       } else if (activeTab === 'withdrawals') {
         await loadWithdrawals();
+      } else if (activeTab === 'tickets') {
+        await loadTickets();
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -174,6 +181,15 @@ export function AdminDashboard() {
     }
   };
 
+  const loadTickets = async () => {
+    try {
+      const data = await TicketService.getAllTickets();
+      setTickets(data);
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+    }
+  };
+
   const handleUserVerification = async (userId: string, verified: boolean) => {
     try {
       console.log('🔐 Alterando verificação do usuário:', userId, verified);
@@ -185,9 +201,11 @@ export function AdminDashboard() {
 
       if (error) throw error;
       console.log('✅ Verificação alterada');
+      setNotification('✅ Verificação do usuário alterada com sucesso!');
       loadUsers(); // Reload data
     } catch (error) {
       console.error('Error updating user:', error);
+      setNotification('❌ Erro ao alterar verificação do usuário');
     }
   };
 
@@ -202,9 +220,11 @@ export function AdminDashboard() {
 
       if (error) throw error;
       console.log('✅ Role alterada');
+      setNotification('✅ Permissão do usuário alterada com sucesso!');
       loadUsers();
     } catch (error) {
       console.error('Error updating user role:', error);
+      setNotification('❌ Erro ao alterar permissão do usuário');
     }
   };
 
@@ -223,9 +243,11 @@ export function AdminDashboard() {
 
       if (error) throw error;
       console.log('✅ Usuário excluído');
+      setNotification('✅ Usuário excluído com sucesso!');
       loadUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
+      setNotification('❌ Erro ao excluir usuário');
     }
   };
   const handleProductApproval = async (productId: string, approved: boolean) => {
@@ -242,9 +264,11 @@ export function AdminDashboard() {
 
       if (error) throw error;
       console.log('✅ Status do produto alterado');
+      setNotification(`✅ Produto ${approved ? 'aprovado' : 'rejeitado'} com sucesso!`);
       loadProducts(); // Reload data
     } catch (error) {
       console.error('Error updating product:', error);
+      setNotification('❌ Erro ao alterar status do produto');
     }
   };
 
@@ -263,9 +287,11 @@ export function AdminDashboard() {
 
       if (error) throw error;
       console.log('✅ Produto excluído');
+      setNotification('✅ Produto excluído com sucesso!');
       loadProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
+      setNotification('❌ Erro ao excluir produto');
     }
   };
   return (

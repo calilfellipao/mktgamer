@@ -17,6 +17,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { SubscriptionSuccessPage } from './pages/SubscriptionSuccessPage';
 import { CheckoutSuccessPage } from './pages/CheckoutSuccessPage';
 import { CheckoutCancelPage } from './pages/CheckoutCancelPage';
+import { NotificationToast } from './components/NotificationToast';
 import { useCart } from './hooks/useCart';
 import { useApp } from './contexts/AppContext';
 import { useAuth } from './contexts/AuthContext';
@@ -98,6 +99,9 @@ export function MainApp() {
           onClose={() => setIsLoginOpen(false)}
         />
       )}
+      
+      {/* Toast de notificações */}
+      <NotificationToast />
     </div>
   );
 }

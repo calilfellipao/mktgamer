@@ -426,15 +426,18 @@ export function CreateProductForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Tipo de Conta *
+                    Condição do Item *
                   </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {conditions.map(condition => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {ConditionService.getConditionsForCategory(formData.category).map(condition => (
                       <button
                         key={condition.id}
                         type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, condition: condition.id }))}
                         className={`p-4 rounded-lg border-2 transition-all text-left ${
-                          'border-gray-700 hover:border-gray-600 bg-gray-800'
+                          formData.condition === condition.id
+                            ? 'border-purple-500 bg-purple-500/10'
+                            : 'border-gray-700 hover:border-gray-600 bg-gray-800'
                         }`}
                       >
                         <h4 className="text-white font-medium mb-1">{condition.name}</h4>
@@ -657,9 +660,9 @@ export function CreateProductForm() {
                         <Badge variant="secondary">
                           {categories.find(c => c.id === formData.category)?.name}
                         </Badge>
-                        {formData.condition && (
+                        {formData.condition && ConditionService.getConditionById(formData.condition) && (
                           <Badge variant="success">
-                            {conditions.find(c => c.id === formData.condition)?.name}
+                            {ConditionService.getConditionById(formData.condition)?.name}
                           </Badge>
                         )}
                         {formData.rarity && formData.category === 'skin' && (

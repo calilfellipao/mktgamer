@@ -87,7 +87,7 @@ export class ProductService {
     level?: number;
     delivery_time: number;
     commission_rate: number;
-    condition: 'new' | 'used' | 'excellent';
+    condition: string;
   }) {
     return ErrorHandler.withRetry(async () => {
       console.log('📝 Criando produto...');

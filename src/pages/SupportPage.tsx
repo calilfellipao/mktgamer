@@ -11,11 +11,17 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
+import { useAuth } from '../contexts/AuthContext';
+import { TicketService } from '../services/ticketService';
 
 export function SupportPage() {
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
+  const [subject, setSubject] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const categories = [
     { id: 'account', name: '👤 Problemas com Conta', description: 'Login, senha, verificação' },
@@ -46,7 +52,34 @@ export function SupportPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedCategory && message.trim()) {
+    
+    if (!user) {
+      alert('Você precisa estar logado para enviar um ticket de suporte.');
+      return;
+    }
+    
+    if (selectedCategory && message.trim() && subject.trim()) {
+      setIsLoading(true);
+      try {
+        await TicketService.createTicket({
+          user_id: user.id,
+          subject: subject,
+          description: message,
+          priority: priority
+        });
+        
+        setIsSubmitted(true);
+        setMessage('');
+        setSubject('');
+        setSelectedCategory('');
+      } catch (error: any) {
+        alert(`Erro ao enviar ticket: ${error.message}`);
+      }
+      setIsLoading(false);
+    } else {
+      alert('Preencha todos os campos obrigatórios.');
+    }
+  };
       setIsSubmitted(true);
       // Here you would normally send the message to your support system
     }
@@ -137,6 +170,21 @@ export function SupportPage() {
                   <h3 className="text-xl font-bold text-white mb-6">Envie sua Mensagem</h3>
                   
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Subject */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Assunto *
+                      </label>
+                      <input
+                        type="text"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                        placeholder="Descreva brevemente o problema..."
+                        required
+                      />
+                    </div>
+
                     {/* Category Selection */}
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-3">
@@ -181,10 +229,15 @@ export function SupportPage() {
                       <label className="block text-sm font-medium text-gray-300 mb-2">
                         Prioridade
                       </label>
-                      <select className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                      <select 
+                        value={priority}
+                        onChange={(e) => setPriority(e.target.value as any)}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                      >
                         <option value="low">🟢 Baixa - Dúvida geral</option>
                         <option value="medium">🟡 Média - Problema que afeta uso</option>
                         <option value="high">🔴 Alta - Problema crítico</option>
+                        <option value="urgent">🚨 Urgente - Sistema fora do ar</option>
                       </select>
                     </div>
 
@@ -193,22 +246,22 @@ export function SupportPage() {
                       variant="primary"
                       className="w-full"
                       icon={Send}
-                      disabled={!selectedCategory || !message.trim()}
+                      disabled={!selectedCategory || !message.trim() || !subject.trim() || isLoading}
                     >
-                      Enviar Mensagem
+                      {isLoading ? 'Enviando...' : 'Enviar Ticket'}
                     </Button>
                   </form>
                 </>
               ) : (
                 <div className="text-center py-12">
                   <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-white mb-2">Mensagem Enviada!</h3>
+                  <h3 className="text-2xl font-bold text-white mb-2">Ticket Criado!</h3>
                   <p className="text-gray-400 mb-6">
-                    Recebemos sua mensagem e nossa equipe entrará em contato em breve.
+                    Seu ticket foi criado com sucesso. Nossa equipe responderá em breve.
                   </p>
                   <div className="bg-gray-800 rounded-lg p-4 mb-6">
                     <p className="text-sm text-gray-400 mb-2">Número do ticket:</p>
-                    <p className="text-white font-mono">#PGM-{Date.now().toString().slice(-6)}</p>
+                    <p className="text-white font-mono">#GGS-{Date.now().toString().slice(-6)}</p>
                   </div>
                   <Button
                     variant="outline"
@@ -216,9 +269,10 @@ export function SupportPage() {
                       setIsSubmitted(false);
                       setSelectedCategory('');
                       setMessage('');
+                      setSubject('');
                     }}
                   >
-                    Enviar Nova Mensagem
+                    Criar Novo Ticket
                   </Button>
                 </div>
               )}

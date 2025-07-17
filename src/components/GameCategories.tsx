@@ -5,7 +5,7 @@ import { games } from '../data/gamesList';
 // Static games list for UI navigation (not mock data)
 
 export function GameCategories() {
-  const { setCurrentPage, setSelectedGame } = useApp();
+  const { setCurrentPage, setSelectedGame, selectedGame } = useApp();
 
   const handleGameClick = (gameName: string) => {
     setSelectedGame(gameName);
@@ -29,13 +29,21 @@ export function GameCategories() {
             <div
               key={game.name}
               onClick={() => handleGameClick(game.name)}
-              className="group relative bg-gray-800 rounded-xl p-3 hover:bg-gray-700 transition-all duration-300 cursor-pointer border border-gray-700 hover:border-purple-500/50 hover:scale-105 min-h-[90px]"
+              className={`group relative rounded-xl p-3 transition-all duration-300 cursor-pointer border hover:scale-105 min-h-[90px] ${
+                selectedGame === game.name 
+                  ? 'bg-purple-600 border-purple-400 shadow-lg shadow-purple-500/25' 
+                  : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:border-purple-500/50'
+              }`}
             >
-              <div className={`absolute inset-0 bg-gradient-to-r ${game.color} opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-300`} />
+              <div className={`absolute inset-0 bg-gradient-to-r ${game.color} ${
+                selectedGame === game.name ? 'opacity-20' : 'opacity-0 group-hover:opacity-10'
+              } rounded-xl transition-opacity duration-300`} />
               
               <div className="text-center">
                 <div className="text-2xl mb-1">{game.icon}</div>
-                <h3 className="text-white font-medium text-xs group-hover:text-purple-300 transition-colors leading-tight">
+                <h3 className={`font-medium text-xs transition-colors leading-tight ${
+                  selectedGame === game.name ? 'text-white font-bold' : 'text-white group-hover:text-purple-300'
+                }`}>
                   {game.name}
                 </h3>
               </div>

@@ -191,7 +191,15 @@ export function ProductsPage({ onAddToCart }: ProductsPageProps) {
                     <button
                       key={game.name}
                       data-game={game.name}
-                      className="w-full text-left px-3 py-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-gray-800"
+                      onClick={() => {
+                        setSelectedGame(game.name);
+                        window.location.reload();
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                        selectedGame === game.name
+                          ? 'bg-purple-600 text-white font-semibold'
+                          : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                      }`}
                     >
                       {game.icon} {game.name}
                     </button>
