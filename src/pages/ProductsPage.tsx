@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { useApp } from '../contexts/AppContext';
 import { ProductService } from '../services/productService';
-import { games } from '../data/mockData';
+import { games } from '../data/gamesList';
 
 interface ProductsPageProps {
   onAddToCart: (product: Product) => void;
