@@ -143,8 +143,8 @@ export function AdminDashboard() {
         .from('transactions')
         .select(`
           *,
-          buyer:users(id, username, email),
-          seller:users(id, username, email),
+          buyer:users!transactions_buyer_id_fkey(id, username, email),
+          seller:users!transactions_seller_id_fkey(id, username, email),
           product:products(title, category, game)
         `)
         .order('created_at', { ascending: false });
