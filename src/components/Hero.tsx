@@ -1,7 +1,10 @@
 import React from 'react';
+import { useState } from 'react';
 import { Shield, Zap, TrendingUp, Star, Users, Award } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useApp } from '../contexts/AppContext';
+import { useAuth } from '../contexts/AuthContext';
+import { LoginModal } from './LoginModal';
 
 export function Hero() {
   const { setCurrentPage } = useApp();
