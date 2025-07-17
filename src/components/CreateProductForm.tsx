@@ -433,11 +433,8 @@ export function CreateProductForm() {
                       <button
                         key={condition.id}
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, condition: condition.id as any }))}
                         className={`p-4 rounded-lg border-2 transition-all text-left ${
-                          formData.condition === condition.id
-                            ? 'border-purple-500 bg-purple-500/10'
-                            : 'border-gray-700 hover:border-gray-600 bg-gray-800'
+                          'border-gray-700 hover:border-gray-600 bg-gray-800'
                         }`}
                       >
                         <h4 className="text-white font-medium mb-1">{condition.name}</h4>

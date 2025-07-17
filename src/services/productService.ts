@@ -87,7 +87,7 @@ export class ProductService {
     level?: number;
     delivery_time: number;
     commission_rate: number;
-    condition: 'immediate_access' | 'email_verified' | 'game_history' | 'social_linked' | 'clean_record';
+    condition: 'new' | 'used' | 'excellent';
   }) {
     return ErrorHandler.withRetry(async () => {
       console.log('📝 Criando produto...');
