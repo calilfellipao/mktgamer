@@ -326,43 +326,30 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
             <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
               <h2 className="text-xl font-bold text-white mb-4">Método de Pagamento</h2>
               
-              <div className="space-y-3">
-                {paymentMethods.map((method) => {
-                  const Icon = method.icon;
-                  const methodTotal = finalTotal + method.fee;
-                  
-                  return (
-                    <button
-                      key={method.id}
-                      onClick={() => setPaymentMethod(method.id)}
-                      className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                        paymentMethod === method.id
-                          ? 'border-purple-500 bg-purple-500/10'
-                          : 'border-gray-700 hover:border-gray-600 bg-gray-800'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <Icon className="w-6 h-6 text-purple-400" />
-                          <div>
-                            <h3 className="text-white font-medium">{method.name}</h3>
-                            <p className="text-gray-400 text-sm">{method.description}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-white font-bold">
-                            R$ {methodTotal.toFixed(2)}
-                          </div>
-                          {method.fee > 0 && (
-                            <div className="text-gray-400 text-sm">
-                              +R$ {method.fee.toFixed(2)} taxa
-                            </div>
-                          )}
-                        </div>
+              <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-6 text-center">
+                <h3 className="text-yellow-300 font-bold mb-2">🚧 Gateway de Pagamento em Desenvolvimento</h3>
+                <p className="text-yellow-400/70 mb-4">
+                  Em breve integraremos com Stripe, MercadoPago e outros gateways de pagamento.
+                </p>
+                
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setPaymentMethod('demo')}
+                    className={`w-full p-4 rounded-lg border-2 transition-all ${
+                      paymentMethod === 'demo'
+                        ? 'border-purple-500 bg-purple-500/10'
+                        : 'border-gray-700 hover:border-gray-600 bg-gray-800'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center space-x-3">
+                      <CreditCard className="w-6 h-6 text-purple-400" />
+                      <div>
+                        <h3 className="text-white font-medium">Pagamento Demo</h3>
+                        <p className="text-gray-400 text-sm">Simular compra para teste</p>
                       </div>
-                    </button>
-                  );
-                })}
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -410,13 +397,13 @@ export function CheckoutPage({ onCheckout }: CheckoutPageProps) {
                 className="w-full"
                 icon={isProcessing ? Clock : DollarSign}
                 onClick={handlePayment}
-                disabled={!paymentMethod || isProcessing}
+                disabled={isProcessing}
               >
-                {isProcessing ? 'Processando...' : 'Finalizar Pagamento'}
+                {isProcessing ? 'Processando Pagamento Demo...' : 'Simular Pagamento'}
               </Button>
 
               <p className="text-xs text-gray-500 text-center mt-4">
-                Ao finalizar a compra, você concorda com nossos Termos de Uso e Política de Privacidade
+                🚧 Modo demonstração - Nenhuma cobrança real será feita
               </p>
             </div>
           </div>

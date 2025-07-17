@@ -444,7 +444,7 @@ export function ProfileSettings() {
                     {!user.is_verified && (
                       <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
                         <p className="text-yellow-300 text-sm">
-                          ⚠️ Você precisa verificar sua conta para solicitar saques. Vá para a aba "Verificação".
+                          🔐 Você precisa verificar sua conta para solicitar saques. Vá para a aba "Verificação".
                         </p>
                       </div>
                     )}

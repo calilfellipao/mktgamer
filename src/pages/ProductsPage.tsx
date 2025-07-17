@@ -172,10 +172,25 @@ export function ProductsPage({ onAddToCart }: ProductsPageProps) {
               {/* Games */}
               <div className="mb-6">
                 <h4 className="text-gray-300 font-medium mb-3">Jogos</h4>
-                <div className="space-y-2">
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <input
+                    type="text"
+                    placeholder="Buscar jogo..."
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+                    onChange={(e) => {
+                      const searchTerm = e.target.value.toLowerCase();
+                      const gameElements = document.querySelectorAll('[data-game]');
+                      gameElements.forEach(el => {
+                        const gameName = el.getAttribute('data-game')?.toLowerCase() || '';
+                        const element = el as HTMLElement;
+                        element.style.display = gameName.includes(searchTerm) ? 'block' : 'none';
+                      });
+                    }}
+                  />
                   {games.map(game => (
                     <button
                       key={game.name}
+                      data-game={game.name}
                       className="w-full text-left px-3 py-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-gray-800"
                     >
                       {game.icon} {game.name}

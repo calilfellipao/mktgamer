@@ -150,16 +150,38 @@ export function CreateProductForm() {
   };
 
   const conditions = [
-    { id: 'new', name: 'Novo', description: 'Item nunca usado' },
-    { id: 'used', name: 'Usado', description: 'Item com sinais de uso' },
-    { id: 'excellent', name: 'Excelente', description: 'Item em ótimo estado' }
+    { id: 'immediate_access', name: '🔓 Acesso Imediato', description: 'Login direto sem senha temporária' },
+    { id: 'email_verified', name: '🛡️ Conta Verificada', description: 'Verificada por e-mail oficial' },
+    { id: 'game_history', name: '🕹️ Com Histórico', description: 'Conta com histórico de jogos' },
+    { id: 'social_linked', name: '⚠️ Redes Sociais', description: 'Vinculada a redes sociais' },
+    { id: 'clean_record', name: '✅ Sem Bans', description: 'Sem bans, suspensões ou strikes' }
   ];
 
   const commissionOptions = [
-    { value: 5, label: '5% - Básico', description: 'Visibilidade padrão' },
-    { value: 10, label: '10% - Padrão', description: 'Boa visibilidade' },
-    { value: 15, label: '15% - Destaque', description: '+200% visibilidade' },
-    { value: 20, label: '20% - Premium Destaque', description: 'Topo dos resultados + Destaques do Dia' }
+    { 
+      value: 5, 
+      label: '🥉 Básico - 5%', 
+      description: 'Visibilidade padrão',
+      benefits: ['Listagem normal', 'Busca padrão']
+    },
+    { 
+      value: 10, 
+      label: '📈 Padrão - 10%', 
+      description: 'Boa visibilidade',
+      benefits: ['Visibilidade padrão', 'Melhor posicionamento']
+    },
+    { 
+      value: 15, 
+      label: '✨ Destaque - 15%', 
+      description: '+200% visibilidade',
+      benefits: ['Visibilidade padrão', '+200% visibilidade', 'Posição privilegiada']
+    },
+    { 
+      value: 20, 
+      label: '🏆 Premium Destaque - 20%', 
+      description: 'Topo dos resultados + Destaques do Dia',
+      benefits: ['Topo dos resultados', 'Destaques do Dia', '+200% visibilidade', 'Visibilidade padrão']
+    }
   ];
 
   const handleSubmit = async () => {
@@ -404,14 +426,14 @@ export function CreateProductForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Condição do Item *
+                    Tipo de Conta *
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {conditions.map(condition => (
                       <button
                         key={condition.id}
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, condition: condition.id }))}
+                        onClick={() => setFormData(prev => ({ ...prev, condition: condition.id as any }))}
                         className={`p-4 rounded-lg border-2 transition-all text-left ${
                           formData.condition === condition.id
                             ? 'border-purple-500 bg-purple-500/10'
@@ -520,20 +542,29 @@ export function CreateProductForm() {
                     Plano de Destaque: {formData.commission_rate}%
                   </label>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     {commissionOptions.map(option => (
                       <button
                         key={option.value}
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, commission_rate: option.value }))}
-                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                           formData.commission_rate === option.value
                             ? 'border-purple-500 bg-purple-500/10'
                             : 'border-gray-700 hover:border-gray-600 bg-gray-800'
                         }`}
                       >
-                        <h4 className="text-white font-medium mb-1">{option.label}</h4>
-                        <p className="text-gray-400 text-sm">{option.description}</p>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-white font-medium">{option.label}</h4>
+                          <span className="text-sm text-gray-400">{option.description}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {option.benefits.map((benefit, index) => (
+                            <span key={index} className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
+                              {benefit}
+                            </span>
+                          ))}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -629,9 +660,11 @@ export function CreateProductForm() {
                         <Badge variant="secondary">
                           {categories.find(c => c.id === formData.category)?.name}
                         </Badge>
-                        <Badge variant="success">
-                          {conditions.find(c => c.id === formData.condition)?.name}
-                        </Badge>
+                        {formData.condition && (
+                          <Badge variant="success">
+                            {conditions.find(c => c.id === formData.condition)?.name}
+                          </Badge>
+                        )}
                         {formData.rarity && formData.category === 'skin' && (
                           <Badge variant="success">
                             {rarities.find(r => r.id === formData.rarity)?.name}

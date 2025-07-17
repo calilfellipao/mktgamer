@@ -25,22 +25,35 @@ export function GameCategories() {
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {games.map((game) => (
+          {games.slice(0, 24).map((game) => (
             <div
               key={game.name}
               onClick={() => handleGameClick(game.name)}
-              className="group relative bg-gray-800 rounded-xl p-4 hover:bg-gray-700 transition-all duration-300 cursor-pointer border border-gray-700 hover:border-purple-500/50 hover:scale-105 min-h-[100px]"
+              className="group relative bg-gray-800 rounded-xl p-3 hover:bg-gray-700 transition-all duration-300 cursor-pointer border border-gray-700 hover:border-purple-500/50 hover:scale-105 min-h-[90px]"
             >
               <div className={`absolute inset-0 bg-gradient-to-r ${game.color} opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-300`} />
               
               <div className="text-center">
-                <div className="text-3xl mb-2">{game.icon}</div>
-                <h3 className="text-white font-semibold text-xs group-hover:text-purple-300 transition-colors leading-tight">
+                <div className="text-2xl mb-1">{game.icon}</div>
+                <h3 className="text-white font-medium text-xs group-hover:text-purple-300 transition-colors leading-tight">
                   {game.name}
                 </h3>
               </div>
             </div>
           ))}
+          
+          {/* Botão "Ver Todos" */}
+          <div
+            onClick={() => setCurrentPage('products')}
+            className="group relative bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl p-3 hover:from-purple-700 hover:to-cyan-600 transition-all duration-300 cursor-pointer hover:scale-105 min-h-[90px] flex items-center justify-center"
+          >
+            <div className="text-center">
+              <div className="text-2xl mb-1">🎮</div>
+              <h3 className="text-white font-bold text-xs">
+                Ver Todos<br/>({games.length}+ jogos)
+              </h3>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -87,15 +87,15 @@ export class ProductService {
     level?: number;
     delivery_time: number;
     commission_rate: number;
-        condition: 'new' | 'used' | 'excellent';
+    condition: 'immediate_access' | 'email_verified' | 'game_history' | 'social_linked' | 'clean_record';
   }) {
     return ErrorHandler.withRetry(async () => {
       console.log('📝 Criando produto...');
       
       // Validar taxa de comissão
-      const allowedRates = [5, 10, 15, 20];
+      const allowedRates = [5, 10, 15, 20]; // Apenas estas taxas são permitidas
       if (!allowedRates.includes(productData.commission_rate)) {
-        throw new Error('Taxa de comissão deve ser 5%, 10%, 15% ou 20%');
+        throw new Error('❌ Taxa inválida! Apenas 5%, 10%, 15% ou 20% são permitidas.');
       }
       
       // Determinar se deve ser destacado (taxa = 20%)

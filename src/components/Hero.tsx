@@ -106,7 +106,7 @@ export function Hero() {
           {!user && (
             <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-4 mb-8">
               <p className="text-yellow-300 text-center">
-                ⚠️ <strong>Faça login para ter acesso a todas as funcionalidades</strong> - comprar, vender, chat e saques
+                🔐 <strong>Faça login para usar todas as funcionalidades do site</strong> - comprar, vender, chat, suporte e saques
               </p>
             </div>
           )}
