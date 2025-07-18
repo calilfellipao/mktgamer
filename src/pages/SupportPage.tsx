@@ -3,7 +3,7 @@ import { MessageCircle, Plus, Clock, CheckCircle, AlertCircle, Send } from 'luci
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { useApp } from '../contexts/AppContext';
-import { ticketService } from '../services/ticketService';
+import { TicketService } from '../services/ticketService';
 
 interface Ticket {
   id: string;
@@ -52,7 +52,7 @@ export function SupportPage() {
     
     setLoading(true);
     try {
-      const userTickets = await ticketService.getUserTickets(user.id);
+      const userTickets = await TicketService.getUserTickets(user.id);
       setTickets(userTickets);
     } catch (error) {
       console.error('Erro ao carregar tickets:', error);
@@ -68,7 +68,7 @@ export function SupportPage() {
 
     setLoading(true);
     try {
-      const ticket = await ticketService.createTicket({
+      const ticket = await TicketService.createTicket({
         user_id: user.id,
         subject: newTicket.subject,
         description: newTicket.description,
@@ -92,7 +92,7 @@ export function SupportPage() {
     if (!selectedTicket || !user || !newMessage.trim()) return;
 
     try {
-      const message = await ticketService.sendMessage({
+      const message = await TicketService.sendMessage({
         ticket_id: selectedTicket.id,
         sender_id: user.id,
         message: newMessage.trim(),
